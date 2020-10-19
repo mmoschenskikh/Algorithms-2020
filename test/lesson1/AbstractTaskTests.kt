@@ -74,6 +74,19 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
+        try { // empty file
+            sortAddresses("input/empty.txt", "temp.txt")
+            assertFileContent("temp.txt", "")
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try { // wrong format
+            assertFails { sortAddresses("input/addr_in4.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     private fun generateTemperatures(size: Int): PerfResult<Unit> {

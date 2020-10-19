@@ -64,8 +64,35 @@ fun sortTimes(inputName: String, outputName: String) {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+// трудоёмкость O(n * log(n)), память O(n)
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    val regex = Regex("^[\\wА-ЯЁа-яё-]+ [\\wА-ЯЁа-яё-]+ - [\\wА-ЯЁа-яё-]+ \\d+\$")
+    val addresses: MutableMap<String, MutableList<String>> = mutableMapOf()
+
+    File(inputName).readLines().map { line ->
+        if (!line.matches(regex))
+            throw IllegalArgumentException("Wrong file format : $line")
+        with(line.split(" - ")) {
+            this.first() to this.last()
+        }
+    }.forEach {
+        val address = it.second
+        if (address !in addresses.keys) {
+            addresses[address] = mutableListOf()
+        }
+        addresses[address]!!.add(it.first)
+    }
+    File(outputName).bufferedWriter().use { bw ->
+        addresses.toList().sortedWith(
+            compareBy(
+                { it.first.split(" ").first() },
+                { it.first.split(" ").last().toInt() }
+            )
+        ).forEach {
+            bw.write("${it.first} - ${it.second.sorted().joinToString(separator = ", ")}")
+            bw.newLine()
+        }
+    }
 }
 
 /**
