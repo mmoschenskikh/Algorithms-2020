@@ -2,6 +2,8 @@
 
 package lesson1
 
+import java.io.File
+
 /**
  * Сортировка времён
  *
@@ -96,8 +98,16 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
+// трудоёмкость O(n * log(n)), память O(n)
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val temperatures = File(inputName).readLines().map { it.toDouble() }
+    require(temperatures.all { it in -273.0..500.0 })
+    File(outputName).bufferedWriter().use { bw ->
+        temperatures.sorted().forEach {
+            bw.write(it.toString())
+            bw.newLine()
+        }
+    }
 }
 
 /**

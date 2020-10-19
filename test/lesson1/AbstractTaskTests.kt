@@ -8,6 +8,7 @@ import java.io.File
 import java.util.*
 import kotlin.math.abs
 import kotlin.system.measureNanoTime
+import kotlin.test.assertFails
 
 abstract class AbstractTaskTests : AbstractFileTests() {
 
@@ -137,6 +138,25 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         }
 
         println("sortTemperatures: $perf")
+
+        try { // empty file
+            sortTemperatures("input/empty.txt", "temp.txt")
+            assertFileContent("temp.txt", "")
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try { // wrong data (text)
+            assertFails { sortTemperatures("input/temp_in2.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try { // wrong data (numbers out of range)
+            assertFails { sortTemperatures("input/temp_in3.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     private fun generateSequence(totalSize: Int, answerSize: Int): PerfResult<Unit> {
