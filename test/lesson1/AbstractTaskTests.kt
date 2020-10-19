@@ -316,6 +316,31 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         }
 
         println("sortSequence: $perf")
+
+        try { // empty file
+            assertFails { sortSequence("input/empty.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try { // one number
+            sortSequence("input/seq_in6.txt", "temp.txt")
+            assertFileContent("temp.txt", "42")
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try { // wrong data
+            assertFails { sortSequence("input/temp_in2.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try { // negative numbers included
+            assertFails { sortSequence("input/seq_in7.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     private fun generateArrays(

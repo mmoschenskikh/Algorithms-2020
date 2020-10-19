@@ -139,8 +139,42 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
+// трудоёмкость O(n + k), память O(n), где k = numbers.max()
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    val numbers = File(inputName).readLines().map { it.toInt() }.toIntArray()
+    require(numbers.isNotEmpty())
+
+    val sortedNumbers = countingSort(numbers, numbers.maxOrNull()!!)
+    var prevNumber = sortedNumbers.firstOrNull() ?: -1
+    var count = 0
+    var movingCount = 0
+    var numberToMove = Int.MAX_VALUE
+
+    for (number in sortedNumbers) {
+        if (number == prevNumber) {
+            count++
+        }
+        if (count > movingCount) {
+            numberToMove = prevNumber
+            movingCount = count
+        } else if (count == movingCount) {
+            numberToMove = minOf(prevNumber, numberToMove)
+        }
+        if (number != prevNumber) {
+            prevNumber = number
+            count = 1
+        }
+    }
+    File(outputName).bufferedWriter().use { bw ->
+        numbers.filter { it != numberToMove }.forEach {
+            bw.write("$it")
+            bw.newLine()
+        }
+        for (i in 1..movingCount) {
+            bw.write("$numberToMove")
+            bw.newLine()
+        }
+    }
 }
 
 /**
