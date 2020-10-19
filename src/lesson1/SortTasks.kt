@@ -167,11 +167,12 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  */
 // трудоёмкость O(n + k), память O(n), где k = numbers.max()
+@Suppress("DEPRECATION")
 fun sortSequence(inputName: String, outputName: String) {
     val numbers = File(inputName).readLines().map { it.toInt() }.toIntArray()
     require(numbers.isNotEmpty())
 
-    val sortedNumbers = countingSort(numbers, numbers.maxOrNull()!!)
+    val sortedNumbers = countingSort(numbers, numbers.max()!!)
     var prevNumber = sortedNumbers.firstOrNull() ?: -1
     var count = 0
     var movingCount = 0
