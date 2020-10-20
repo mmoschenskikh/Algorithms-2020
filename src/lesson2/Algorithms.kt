@@ -108,6 +108,18 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
  */
+// Решето Эратосфена, трудоёмкость O(n * log(log(n))), память O(n)
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit <= 1) return 0
+    val primes = BooleanArray(limit + 1) { true }
+    primes[0] = false
+    primes[1] = false
+    for (i in 2..limit) {
+        if (primes[i]) {
+            var k = 1
+            while (++k * i <= limit)
+                primes[k * i] = false
+        }
+    }
+    return primes.count { it }
 }
