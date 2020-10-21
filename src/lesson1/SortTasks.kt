@@ -168,40 +168,23 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
-// трудоёмкость O(n + k), память O(n), где k = numbers.max()
-@Suppress("DEPRECATION")
+// трудоёмкость O(n), память O(n)
 fun sortSequence(inputName: String, outputName: String) {
-    val numbers = File(inputName).readLines().map { it.toInt() }.toIntArray()
-    require(numbers.isNotEmpty())
+    val numbers = File(inputName).readLines().map { it.toInt() }
+    require(numbers.isNotEmpty() && numbers.all { it > 0 })
 
-    val sortedNumbers = countingSort(numbers, numbers.max()!!)
-    var prevNumber = sortedNumbers.firstOrNull() ?: -1
-    var count = 0
-    var movingCount = 0
-    var numberToMove = Int.MAX_VALUE
+    val count: MutableMap<Int, Int> = mutableMapOf()
+    numbers.forEach { count[it] = count[it]?.plus(1) ?: 1 }
 
-    for (number in sortedNumbers) {
-        if (number == prevNumber) {
-            count++
-        }
-        if (count > movingCount) {
-            numberToMove = prevNumber
-            movingCount = count
-        } else if (count == movingCount) {
-            numberToMove = minOf(prevNumber, numberToMove)
-        }
-        if (number != prevNumber) {
-            prevNumber = number
-            count = 1
-        }
-    }
+    val numberToMove = count.maxWithOrNull(compareBy({ it.value }, { -it.key }))!!
+
     File(outputName).bufferedWriter().use { bw ->
-        numbers.filter { it != numberToMove }.forEach {
+        numbers.filter { it != numberToMove.key }.forEach {
             bw.write("$it")
             bw.newLine()
         }
-        for (i in 1..movingCount) {
-            bw.write("$numberToMove")
+        for (i in 1..numberToMove.value) {
+            bw.write("${numberToMove.key}")
             bw.newLine()
         }
     }

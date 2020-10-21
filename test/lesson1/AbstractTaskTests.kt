@@ -354,6 +354,25 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
+        try {
+            sortSequence("input/temp_in4.txt", "temp.txt")
+            assertFileContent(
+                "temp.txt",
+                """
+                    1
+                    3
+                    3
+                    1
+                    1000000000
+                    2
+                    2
+                    2
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     private fun generateArrays(
