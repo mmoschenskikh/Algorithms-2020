@@ -125,13 +125,15 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
-// трудоёмкость O(n * log(n)), память O(n)
+// трудоёмкость O(n), память O(n)
 fun sortTemperatures(inputName: String, outputName: String) {
-    val temperatures = File(inputName).readLines().map { it.toDouble() }
-    require(temperatures.all { it in -273.0..500.0 })
+    val minTemp = 2730
+    val maxTemp = 5000 + minTemp
+    val temperatures = File(inputName).readLines().map { (it.toDouble() * 10).toInt() + minTemp }.toIntArray()
+    require(temperatures.all { it in 0..maxTemp })
     File(outputName).bufferedWriter().use { bw ->
-        temperatures.sorted().forEach {
-            bw.write(it.toString())
+        countingSort(temperatures, maxTemp).forEach {
+            bw.write("${(it - minTemp).toDouble() / 10}")
             bw.newLine()
         }
     }
