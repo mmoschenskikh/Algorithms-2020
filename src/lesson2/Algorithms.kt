@@ -31,7 +31,7 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
 }
 
 /**
- * Задача Иосифа Флафия.
+ * Задача Иосифа Флавия.
  * Простая
  *
  * Образовав круг, стоят menNumber человек, пронумерованных от 1 до menNumber.
@@ -95,7 +95,21 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    val height = first.length
+    val width = second.length
+    val matrix = Array(height) { IntArray(width) { 0 } }
+    var longest = ""
+    for (i in 0 until height) {
+        for (j in 0 until width) {
+            val prev = if (i == 0 || j == 0) 0 else matrix[i - 1][j - 1]
+            matrix[i][j] = if (first[i] == second[j]) (prev + 1) else 0
+            val length = matrix[i][j]
+            if (length > longest.length) {
+                longest = first.substring(i - length + 1, i + 1)
+            }
+        }
+    }
+    return longest
 }
 
 /**
