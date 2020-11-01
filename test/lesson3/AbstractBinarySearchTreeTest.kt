@@ -3,10 +3,7 @@ package lesson3
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.util.*
 import kotlin.math.abs
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 abstract class AbstractBinarySearchTreeTest {
 
@@ -206,11 +203,12 @@ abstract class AbstractBinarySearchTreeTest {
                     "BinarySearchTreeIterator doesn't traverse the tree correctly."
                 )
             }
-            assertFailsWith<IllegalStateException>("Something was supposedly returned after the elements ended") {
+            assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
                 binaryIter.next()
             }
             println("All clear!")
         }
+        assertFails { create().iterator().next() } // next() on empty BST
     }
 
     protected fun doIteratorRemoveTest() {
@@ -278,6 +276,7 @@ abstract class AbstractBinarySearchTreeTest {
             }
             println("All clear!")
         }
+        assertFails { create().iterator().remove() } // remove() without calling next()
     }
 
     protected fun doSubSetTest() {

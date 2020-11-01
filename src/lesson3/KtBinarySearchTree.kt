@@ -91,7 +91,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
      *
      * Средняя
      */
-    // трудоёмкость O(n), где n - высота дерева; дополнительная память не требуется
+    // трудоёмкость O(h), где h - высота дерева; дополнительная память не требуется
     override fun remove(element: T): Boolean {
         with(find(element)) {
             if (this == null || this.value != element) return false
@@ -150,6 +150,21 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
 
     inner class BinarySearchTreeIterator internal constructor() : MutableIterator<T> {
 
+        private val elements: Queue<T> = LinkedList()
+        private var current: T? = null
+
+        init {
+            // трудоёмкость O(n), память O(n)
+            infixTraverse(root) { elements.add(it) }
+        }
+
+        private fun infixTraverse(node: Node<T>?, function: (T) -> Unit) {
+            if (node == null) return
+            infixTraverse(node.left, function)
+            function(node.value)
+            infixTraverse(node.right, function)
+        }
+
         /**
          * Проверка наличия следующего элемента
          *
@@ -160,9 +175,9 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
+        // трудоёмкость O(1), дополнительная память не требуется
         override fun hasNext(): Boolean {
-            // TODO
-            throw NotImplementedError()
+            return elements.isNotEmpty()
         }
 
         /**
@@ -178,9 +193,10 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Средняя
          */
+        // трудоёмкость O(1), дополнительная память не требуется
         override fun next(): T {
-            // TODO
-            throw NotImplementedError()
+            current = elements.remove()
+            return current!!
         }
 
         /**
@@ -195,9 +211,11 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Сложная
          */
+        // трудоёмкость O(h), где h - высота дерева; дополнительная память не требуется
         override fun remove() {
-            // TODO
-            throw NotImplementedError()
+            if (current == null) throw IllegalStateException()
+            remove(current)
+            current = null
         }
 
     }
