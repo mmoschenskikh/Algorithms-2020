@@ -30,6 +30,18 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         }
     }
 
+    private fun findParent(node: Node<T>): Node<T>? =
+        if (node == root) null else root?.let { findParent(it, node) }
+
+    private fun findParent(start: Node<T>, node: Node<T>): Node<T>? {
+        val comparison = node.value.compareTo(start.value)
+        return when {
+            comparison < 0 -> if (start.left == node) start else start.left?.let { findParent(it, node) }
+            comparison > 0 -> if (start.right == node) start else start.right?.let { findParent(it, node) }
+            else -> null
+        }
+    }
+
     override operator fun contains(element: T): Boolean {
         val closest = find(element)
         return closest != null && element.compareTo(closest.value) == 0
@@ -75,12 +87,59 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
      * Высота дерева не должна увеличиться в результате удаления.
      *
      * Спецификация: [java.util.Set.remove] (Ctrl+Click по remove)
-     * (в Котлине тип параметера изменён с Object на тип хранимых в дереве данных)
+     * (в Котлине тип параметра изменён с Object на тип хранимых в дереве данных)
      *
      * Средняя
      */
+    // трудоёмкость O(n), где n - высота дерева; дополнительная память не требуется
     override fun remove(element: T): Boolean {
-        TODO()
+        with(find(element)) {
+            if (this == null || this.value != element) return false
+        }
+        remove(root!!, element)
+        size--
+        return true
+    }
+
+    private fun remove(start: Node<T>, element: T) {
+        when {
+            element > start.value -> start.right?.let { remove(it, element) }
+            element < start.value -> start.left?.let { remove(it, element) }
+            else -> {
+                val node = find(element)!!
+                val parent = findParent(node)
+                val newValue: Node<T>?
+                if (node.left == null && node.right == null) {
+                    newValue = null
+                } else if (node.left == null || node.right == null) {
+                    newValue = node.left ?: node.right
+                } else {
+                    if (node.right!!.left == null) {
+                        node.right!!.left = node.left
+                        newValue = node.right
+                    } else {
+                        var minNode = node.right!!
+                        var minNodeParent = node
+                        while (minNode.left != null) {
+                            minNodeParent = minNode
+                            minNode = minNode.left!!
+                        }
+                        minNodeParent.left = minNode.right
+                        minNode.left = node.left
+                        minNode.right = node.right
+                        newValue = minNode
+                    }
+                }
+                if (parent == null) {
+                    root = newValue
+                } else {
+                    if (parent.left == node)
+                        parent.left = newValue
+                    else
+                        parent.right = newValue
+                }
+            }
+        }
     }
 
     override fun comparator(): Comparator<in T>? =

@@ -1,11 +1,12 @@
 package lesson3
 
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.util.*
 import kotlin.math.abs
-import kotlin.test.*
-import org.junit.jupiter.api.assertDoesNotThrow
-import kotlin.IllegalStateException
-import kotlin.NoSuchElementException
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 abstract class AbstractBinarySearchTreeTest {
 
@@ -162,6 +163,11 @@ abstract class AbstractBinarySearchTreeTest {
             }
             println("All clear!")
         }
+
+        val bst = create()
+        assertFalse { bst.remove(45) } // empty BST
+        bst.addAll(listOf(1, 2, 3, 4, 5, 6, 7, 8))
+        assertFalse(bst.remove(9)) // removing element not present in BST
     }
 
     protected fun doIteratorTest() {
