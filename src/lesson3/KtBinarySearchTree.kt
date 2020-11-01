@@ -97,7 +97,6 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
             if (this == null || this.value != element) return false
         }
         remove(root!!, element)
-        size--
         return true
     }
 
@@ -138,6 +137,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
                     else
                         parent.right = newValue
                 }
+                size--
             }
         }
     }
@@ -150,18 +150,18 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
 
     inner class BinarySearchTreeIterator internal constructor() : MutableIterator<T> {
 
-        private val elements: Queue<T> = LinkedList()
-        private var current: T? = null
+        private val elements: Queue<Node<T>> = LinkedList()
+        private var current: Node<T>? = null
 
         init {
             // трудоёмкость O(n), память O(n)
             infixTraverse(root) { elements.add(it) }
         }
 
-        private fun infixTraverse(node: Node<T>?, function: (T) -> Unit) {
+        private fun infixTraverse(node: Node<T>?, function: (Node<T>) -> Unit) {
             if (node == null) return
             infixTraverse(node.left, function)
-            function(node.value)
+            function(node)
             infixTraverse(node.right, function)
         }
 
@@ -196,7 +196,7 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
         // трудоёмкость O(1), дополнительная память не требуется
         override fun next(): T {
             current = elements.remove()
-            return current!!
+            return current!!.value
         }
 
         /**
@@ -211,10 +211,10 @@ class KtBinarySearchTree<T : Comparable<T>> : AbstractMutableSet<T>(), Checkable
          *
          * Сложная
          */
-        // трудоёмкость O(h), где h - высота дерева; дополнительная память не требуется
+        // трудоёмкость O(1), дополнительная память не требуется
         override fun remove() {
             if (current == null) throw IllegalStateException()
-            remove(current)
+            remove(current!!, current!!.value)
             current = null
         }
 
