@@ -1,5 +1,7 @@
 package lesson4
 
+import java.util.*
+
 /**
  * Префиксное дерево для строк
  */
@@ -54,7 +56,12 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
 
     override fun remove(element: String): Boolean {
         val current = findNode(element) ?: return false
-        if (current.children.remove(0.toChar()) != null) {
+        return remove(current)
+    }
+
+    // трудоёмкость O(1), дополнительная память не требуется
+    private fun remove(node: Node): Boolean {
+        if (node.children.remove(0.toChar()) != null) {
             size--
             return true
         }
@@ -68,8 +75,42 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
      *
      * Сложная
      */
-    override fun iterator(): MutableIterator<String> {
-        TODO()
-    }
+    override fun iterator(): MutableIterator<String> = TrieIterator()
 
+    inner class TrieIterator internal constructor() : MutableIterator<String> {
+
+        private val elements: Queue<Pair<String, Node>> = LinkedList()
+        private var current: Pair<String, Node>? = null
+
+        init {
+            // трудоёмкость O(n), память O(m * l),
+            // где n - количество букв в дереве, m - количество слов в дереве, l - длина самого длинного слова
+            traverse(root, "")
+        }
+
+        private fun traverse(node: Node, prefix: String): String {
+            node.children.forEach { (ch, n) ->
+                val string = traverse(n, prefix + ch)
+                if (n.children.containsKey(0.toChar()))
+                    elements.add(string to n)
+            }
+            return if (node.children.isEmpty()) prefix + 0.toChar() else prefix
+        }
+
+        // трудоёмкость O(1), дополнительная память не требуется
+        override fun hasNext() = elements.isNotEmpty()
+
+        // трудоёмкость O(1), дополнительная память не требуется
+        override fun next(): String {
+            current = elements.remove()
+            return current!!.first
+        }
+
+        // трудоёмкость O(1), дополнительная память не требуется
+        override fun remove() {
+            if (current == null) throw IllegalStateException()
+            remove(current!!.second)
+            current = null
+        }
+    }
 }

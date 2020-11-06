@@ -1,8 +1,8 @@
 package lesson4
 
+import ru.spbstu.kotlin.generate.util.nextString
 import java.util.*
 import kotlin.math.abs
-import ru.spbstu.kotlin.generate.util.nextString
 import kotlin.test.*
 
 abstract class AbstractTrieTest {
@@ -104,11 +104,25 @@ abstract class AbstractTrieTest {
                 controlSet.isEmpty(),
                 "TrieIterator doesn't traverse the entire set."
             )
-            assertFailsWith<IllegalStateException>("Something was supposedly returned after the elements ended") {
+            // Исправил выбрасываемое исключение по аналогии с третьим уроком
+            assertFailsWith<NoSuchElementException>("Something was supposedly returned after the elements ended") {
                 trieIter.next()
             }
             println("All clear!")
         }
+
+        assertFails { create().iterator().next() }
+
+        val set = setOf("Kotlin", "Kotoed", "KotOR")
+        val t = create()
+        t.addAll(set)
+        val iter = t.iterator()
+        while (iter.hasNext()) {
+            val s = iter.next()
+            assertTrue(s in set)
+        }
+        assertEquals(3, t.size)
+        assertEquals(set, t)
     }
 
     protected fun doIteratorRemoveTest() {
@@ -170,6 +184,22 @@ abstract class AbstractTrieTest {
             }
             println("All clear!")
         }
+
+        assertFails { create().iterator().remove() }
+
+        val set = setOf("Kotlin", "Kotoed", "KotOR")
+        val t = create()
+        t.addAll(set)
+        val iter = t.iterator()
+        while (iter.hasNext()) {
+            val s = iter.next()
+            if (s == "KotOR") {
+                iter.remove()
+                break
+            }
+        }
+        assertEquals(2, t.size)
+        assertEquals(setOf("Kotlin", "Kotoed"), t)
     }
 
 }
