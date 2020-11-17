@@ -53,7 +53,7 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         val startingIndex = element.startingIndex()
         var index = startingIndex
         var current = storage[index]
-        while (current != null && current != dd) {
+        while (current.exists()) {
             if (current == element) {
                 return false
             }
@@ -97,6 +97,9 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         return false
     }
 
+    // трудоёмкость O(1), дополнительная память не требуется
+    private fun Any?.exists() = this != null && this != dd
+
     /**
      * Создание итератора для обхода таблицы
      *
@@ -107,7 +110,34 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      *
      * Средняя (сложная, если поддержан и remove тоже)
      */
-    override fun iterator(): MutableIterator<T> {
-        TODO("not implemented")
+    override fun iterator(): MutableIterator<T> =
+        OpenAddressingSetIterator()
+
+    inner class OpenAddressingSetIterator internal constructor() : MutableIterator<T> {
+
+        private var index = -1
+        private val lastIndex = storage.indexOfLast { it.exists() }
+
+        // трудоёмкость O(1), дополнительная память не требуется
+        override fun hasNext(): Boolean = index < lastIndex
+
+        // трудоёмкость O(n), дополнительная память не требуется
+        override fun next(): T {
+            var current: Any?
+            while (index < lastIndex) {
+                current = storage[++index]
+                if (current.exists()) {
+                    return current as T
+                }
+            }
+            throw NoSuchElementException()
+        }
+
+        // трудоёмкость O(1), дополнительная память не требуется
+        override fun remove() {
+            check(index != -1 && storage[index].exists())
+            storage[index] = dd
+            size--
+        }
     }
 }
