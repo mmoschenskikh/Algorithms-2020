@@ -25,13 +25,15 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      * Проверка, входит ли данный элемент в таблицу
      */
     override fun contains(element: T): Boolean {
-        var index = element.startingIndex()
+        val startingIndex = element.startingIndex()
+        var index = startingIndex
         var current = storage[index]
         while (current != null) {
             if (current == element) {
                 return true
             }
             index = (index + 1) % capacity
+            if (index == startingIndex) return false // Функция некорректно работала в случае, когда таблица заполнена
             current = storage[index]
         }
         return false
@@ -51,7 +53,7 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         val startingIndex = element.startingIndex()
         var index = startingIndex
         var current = storage[index]
-        while (current != null) {
+        while (current != null && current != dd) {
             if (current == element) {
                 return false
             }
@@ -64,6 +66,8 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         return true
     }
 
+    private val dd = object {}
+
     /**
      * Удаление элемента из таблицы
      *
@@ -75,8 +79,22 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
      *
      * Средняя
      */
+    // трудоёмкость O(n), дополнительная память не требуется
     override fun remove(element: T): Boolean {
-        TODO("not implemented")
+        val startingIndex = element.startingIndex()
+        var index = startingIndex
+        var current = storage[index]
+        while (current != null) {
+            if (current == element) {
+                storage[index] = dd
+                size--
+                return true
+            }
+            index = (index + 1) % capacity
+            if (index == startingIndex) return false
+            current = storage[index]
+        }
+        return false
     }
 
     /**

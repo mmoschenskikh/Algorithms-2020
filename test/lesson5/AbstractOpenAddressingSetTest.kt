@@ -76,6 +76,21 @@ abstract class AbstractOpenAddressingSetTest {
                 )
             }
         }
+        val test = create<String>(2)
+        test.add("Hello")
+        test.add("Пожалуйста")
+        test.add("Проверьте")
+        test.add("Задачки")
+        assertTrue { test.size == 4 }
+        assertTrue { test.remove("Проверьте") }
+        assertTrue { test.size == 3 }
+        assertFalse { test.remove("World") }
+        assertTrue { test.remove("Hello") }
+        assertTrue { test.remove("Пожалуйста") }
+        assertTrue { test.size == 1 }
+        assertTrue { test.remove("Задачки") }
+        assertTrue { test.size == 0 }
+        assertFalse { test.remove("Задачки") }
     }
 
     protected fun doIteratorTest() {
