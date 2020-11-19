@@ -124,7 +124,7 @@ class KtOpenAddressingSet<T : Any>(private val bits: Int) : AbstractMutableSet<T
         // трудоёмкость O(n), дополнительная память не требуется
         override fun next(): T {
             var current: Any?
-            while (index < lastIndex) {
+            while (hasNext()) {
                 current = storage[++index]
                 if (current.exists()) {
                     return current as T
