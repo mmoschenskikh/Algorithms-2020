@@ -14,8 +14,33 @@ package lesson7
  * Если есть несколько самых длинных общих подпоследовательностей, вернуть любую из них.
  * При сравнении подстрок, регистр символов *имеет* значение.
  */
+// трудоёмкость O(m * n), память O((m + 1) * (n + 1)), где m = first.length, n = second.length
 fun longestCommonSubSequence(first: String, second: String): String {
-    TODO()
+    val height = first.length + 1
+    val width = second.length + 1
+    val lcs = Array(height) { IntArray(width) { 0 } }
+    for (i in 1 until height) {
+        for (j in 1 until width) {
+            lcs[i][j] = when {
+                first[i - 1] == second[j - 1] -> lcs[i - 1][j - 1] + 1
+                else -> maxOf(lcs[i][j - 1], lcs[i - 1][j])
+            }
+        }
+    }
+    val answer = StringBuilder()
+    fun collectLCS(i: Int, j: Int) {
+        when {
+            i == 0 || j == 0 -> return
+            first[i - 1] == second[j - 1] -> {
+                answer.append(first[i - 1])
+                collectLCS(i - 1, j - 1)
+            }
+            lcs[i - 1][j] == lcs[i][j] -> collectLCS(i - 1, j)
+            else -> collectLCS(i, j - 1)
+        }
+    }
+    collectLCS(height - 1, width - 1)
+    return answer.reverse().toString()
 }
 
 /**

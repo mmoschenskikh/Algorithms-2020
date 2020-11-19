@@ -1,5 +1,7 @@
 package lesson7
 
+import ru.spbstu.kotlin.generate.util.nextString
+import java.util.*
 import kotlin.test.assertEquals
 
 abstract class AbstractDynamicTests {
@@ -35,6 +37,9 @@ abstract class AbstractDynamicTests {
                 """.trimIndent()
             ).length, "Answer must have length of $expectedLength2"
         )
+        assertEquals("", longestCommonSubSequence("", ""))
+        val s = Random().nextString("abcdefghijklmnopqrstuvwxyz0123456789", 1000)
+        assertEquals(s, longestCommonSubSequence("ja${s}va", "kot${s}lin"))
     }
 
     fun longestIncreasingSubSequence(longestIncreasingSubSequence: (List<Int>) -> List<Int>) {
