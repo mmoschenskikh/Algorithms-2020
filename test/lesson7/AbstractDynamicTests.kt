@@ -2,6 +2,7 @@ package lesson7
 
 import ru.spbstu.kotlin.generate.util.nextString
 import java.util.*
+import java.util.stream.Collectors
 import kotlin.test.assertEquals
 
 abstract class AbstractDynamicTests {
@@ -60,6 +61,8 @@ abstract class AbstractDynamicTests {
                 )
             )
         )
+        val list = Random().ints(9999).boxed().collect(Collectors.toSet()).toList().sorted()
+        assertEquals(list, longestIncreasingSubSequence(list))
     }
 
     fun shortestPathOnField(shortestPathOnField: (String) -> Int) {

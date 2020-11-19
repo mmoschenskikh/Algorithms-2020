@@ -2,6 +2,8 @@
 
 package lesson7
 
+import java.util.*
+
 /**
  * Наибольшая общая подпоследовательность.
  * Средняя
@@ -55,8 +57,32 @@ fun longestCommonSubSequence(first: String, second: String): String {
  * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
  * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
  */
+// трудоёмкость O(n^2), память O(n)
 fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
-    TODO()
+    val size = list.size
+    if (size == 0) return list
+    val prev = IntArray(size) { -1 }
+    val localLength = IntArray(size) { 1 }
+    var length = 0
+    var pos = -1
+    for (i in list.indices) {
+        for (j in 0 until i) {
+            if (list[j] < list[i] && localLength[j] + 1 > localLength[i]) {
+                localLength[i] = localLength[j] + 1
+                prev[i] = j
+            }
+        }
+        if (localLength[i] > length) {
+            length = localLength[i]
+            pos = i
+        }
+    }
+    val answer = LinkedList<Int>()
+    while (pos != -1) {
+        answer.addFirst(list[pos])
+        pos = prev[pos]
+    }
+    return answer
 }
 
 /**
