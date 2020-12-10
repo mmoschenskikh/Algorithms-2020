@@ -83,6 +83,9 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
         private val branchingIndices: Deque<Int> = LinkedList()
         private val discovered = mutableSetOf<Node>()
         private val currentString = StringBuilder()
+        private val sizeAtStart = size
+        private var prevBranching: Deque<Node> = LinkedList()
+        private var current: Node? = null
         private var stringsFound = 0
 
         init {
@@ -92,12 +95,14 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
             }
         }
 
-        override fun hasNext(): Boolean = stringsFound < size
+        override fun hasNext(): Boolean = stringsFound < sizeAtStart
 
         override fun next(): String {
             if (!hasNext()) throw NoSuchElementException()
             if (branchingIndices.isNotEmpty() && currentString.isNotEmpty())
-                currentString.delete(branchingIndices.removeFirst(), currentString.length - 1)
+                currentString.delete(branchingIndices.removeFirst(), currentString.length)
+            if (prevBranching.isNotEmpty())
+                current = prevBranching.removeFirst()
             do {
                 val pair = toVisit.removeFirst()
                 val char = pair.first
@@ -106,17 +111,28 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
                 for (child in node.children.filter { it.value !in discovered }) {
                     toVisit.addFirst(child.toPair())
                 }
-                if (node.children.size > 1)
-                    for (i in 1 until node.children.size)
+                if (node.children.size > 1) {
+                    for (i in 1 until node.children.size) {
+                        prevBranching.addFirst(node)
                         branchingIndices.addFirst(currentString.length + 1)
-                currentString.append(char)
+                    }
+                }
+                if (char != 0.toChar()) {
+                    currentString.append(char)
+                    current = node
+                    if (node.children.isEmpty()) {
+                        currentString.delete(branchingIndices.removeFirst(), currentString.length)
+                    }
+                }
             } while (char != 0.toChar())
             stringsFound++
-            return currentString.filter { it != 0.toChar() }.toString()
+            return currentString.toString()
         }
 
         override fun remove() {
-            TODO("Not yet implemented")
+            if (current == null) throw IllegalStateException()
+            remove(current!!)
+            current = null
         }
     }
 }
