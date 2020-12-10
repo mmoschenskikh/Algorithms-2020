@@ -104,8 +104,7 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
             if (!hasNext()) throw NoSuchElementException()
             if (branchingIndices.isNotEmpty() && currentString.isNotEmpty())
                 currentString.delete(branchingIndices.removeFirst(), currentString.length)
-            if (prevBranching.isNotEmpty())
-                current = prevBranching.removeFirst()
+            current = prevBranching.pollFirst() ?: current
             do {
                 val pair = toVisit.removeFirst()
                 val char = pair.first
@@ -123,7 +122,7 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
                 if (char != 0.toChar()) {
                     currentString.append(char)
                     current = node
-                    if (node.children.isEmpty()) {
+                    if (node.children.isEmpty()) { // значит, слово удалено
                         currentString.delete(branchingIndices.removeFirst(), currentString.length)
                     }
                 }
