@@ -79,38 +79,44 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
 
     inner class TrieIterator internal constructor() : MutableIterator<String> {
 
-        private val elements: Queue<Pair<String, Node>> = LinkedList()
-        private var current: Pair<String, Node>? = null
+        private val toVisit: Deque<Pair<Char, Node>> = LinkedList()
+        private val branchingIndices: Deque<Int> = LinkedList()
+        private val discovered = mutableSetOf<Node>()
+        private val currentString = StringBuilder()
+        private var stringsFound = 0
 
         init {
-            // трудоёмкость O(n), память O(m * l),
-            // где n - количество букв в дереве, m - количество слов в дереве, l - длина самого длинного слова
-            traverse(root, "")
-        }
-
-        private fun traverse(node: Node, prefix: String): String {
-            node.children.forEach { (ch, n) ->
-                val string = traverse(n, prefix + ch)
-                if (n.children.containsKey(0.toChar()))
-                    elements.add(string to n)
+            for (child in root.children) {
+                branchingIndices.addFirst(currentString.length)
+                toVisit.addFirst(child.toPair())
             }
-            return if (node.children.isEmpty()) prefix + 0.toChar() else prefix
         }
 
-        // трудоёмкость O(1), дополнительная память не требуется
-        override fun hasNext() = elements.isNotEmpty()
+        override fun hasNext(): Boolean = stringsFound < size
 
-        // трудоёмкость O(1), дополнительная память не требуется
         override fun next(): String {
-            current = elements.remove()
-            return current!!.first
+            if (!hasNext()) throw NoSuchElementException()
+            if (branchingIndices.isNotEmpty() && currentString.isNotEmpty())
+                currentString.delete(branchingIndices.removeFirst(), currentString.length - 1)
+            do {
+                val pair = toVisit.removeFirst()
+                val char = pair.first
+                val node = pair.second
+                discovered.add(node)
+                for (child in node.children.filter { it.value !in discovered }) {
+                    toVisit.addFirst(child.toPair())
+                }
+                if (node.children.size > 1)
+                    for (i in 1 until node.children.size)
+                        branchingIndices.addFirst(currentString.length + 1)
+                currentString.append(char)
+            } while (char != 0.toChar())
+            stringsFound++
+            return currentString.filter { it != 0.toChar() }.toString()
         }
 
-        // трудоёмкость O(1), дополнительная память не требуется
         override fun remove() {
-            if (current == null) throw IllegalStateException()
-            remove(current!!.second)
-            current = null
+            TODO("Not yet implemented")
         }
     }
 }
