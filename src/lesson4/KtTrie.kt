@@ -95,8 +95,11 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
             }
         }
 
+        // трудоёмкость O(1), дополнительная память не требуется
         override fun hasNext(): Boolean = stringsFound < sizeAtStart
 
+        // трудоёмкость O(n) в худшем случае (удалены все элементы, кроме одного), память O(n + m) в худшем случае
+        // где n - количество букв в дереве, m - длина самого длинного слова
         override fun next(): String {
             if (!hasNext()) throw NoSuchElementException()
             if (branchingIndices.isNotEmpty() && currentString.isNotEmpty())
@@ -129,6 +132,7 @@ class KtTrie : AbstractMutableSet<String>(), MutableSet<String> {
             return currentString.toString()
         }
 
+        // трудоёмкость O(1), дополнительная память не требуется
         override fun remove() {
             if (current == null) throw IllegalStateException()
             remove(current!!)
